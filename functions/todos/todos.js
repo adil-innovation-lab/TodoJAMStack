@@ -29,34 +29,36 @@ const resolvers = {
           )
         )
 
-        console.log(result.ref.data);
+        console.log(result.data);
         
-        return [{}]
+        return result.data.map( data => {
+          return {
+            id: data.ts,
+            text: data.data.text,
+            done: data.data.done
+          }
+        })
       }
       catch(error) {
         console.log(error);
       }
     },
-    // authorByName: (root, args, context) => {
-    //   console.log('hihhihi', args.name)
-    //   return authors.find(x => x.name === args.name) || 'NOTFOUND'
-    // },
   },
   Mutation: {
-    addTodo: async (_, {text}) => {
+    addTodo: async (_, { text }) => {
       try {
-        const adminClient = new faunadb.Client({ secret: 'fnAD5ROVOYACAQm6ir9vz5oDW6Mm6QLQE1_I24Zf' });
+        const adminClient = new faunadb.Client({ secret: process.env.FAUNADB_ADMIN_SECRET });
         const result = await adminClient.query(
           q.Create(
             q.Collection('todos'),
             { data: {
               text: text,
               done: false
-            }}
+            }},
           )
         )
         
-        return [{}]
+        return result.ref.data;
       }
       catch(error) {
         console.log(error);
